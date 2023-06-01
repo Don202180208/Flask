@@ -5,7 +5,8 @@ from kivy.uix.textinput import TextInput
 from kivy.graphics import Color, Rectangle
 
 
-Builder.load_string("""
+Builder.load_string(
+    """
 <CoffeeShop>:
     orientation: 'vertical'
     spacing: dp(20)
@@ -111,28 +112,39 @@ Builder.load_string("""
                 font_size: sp(36)
                 bold: True
                 halign: 'center'
-                valign: 'middle' """)
+                valign: 'middle' """
+)
+
 
 class CoffeeShop(BoxLayout):
     def compute_total(self):
-        americano_price = 80.00 if self.ids.americano_spinner.text == 'Small' else 120.00
-        americano_qty = int(self.ids.americano_qty.text) if self.ids.americano_qty.text else 0
+        americano_price = (
+            80.00 if self.ids.americano_spinner.text == "Small" else 120.00
+        )
+        americano_qty = (
+            int(self.ids.americano_qty.text) if self.ids.americano_qty.text else 0
+        )
         americano_cost = americano_qty * americano_price
 
-        cappuccino_price = 90.00 if self.ids.cappuccino_spinner.text == 'Small' else 140.00
-        cappuccino_qty = int(self.ids.cappuccino_qty.text) if self.ids.cappuccino_qty.text else 0
+        cappuccino_price = (
+            90.00 if self.ids.cappuccino_spinner.text == "Small" else 140.00
+        )
+        cappuccino_qty = (
+            int(self.ids.cappuccino_qty.text) if self.ids.cappuccino_qty.text else 0
+        )
         cappuccino_cost = cappuccino_qty * cappuccino_price
 
-        latte_price = 100.00 if self.ids.latte_spinner.text == 'Small' else 160.00
+        latte_price = 100.00 if self.ids.latte_spinner.text == "Small" else 160.00
         latte_qty = int(self.ids.latte_qty.text) if self.ids.latte_qty.text else 0
         latte_cost = latte_qty * latte_price
 
         total = americano_cost + cappuccino_cost + latte_cost
-        self.ids.total_label.text = f'Total: P{total:.2f}'
+        self.ids.total_label.text = f"Total: P{total:.2f}"
+
     def __init__(self, **kwargs):
         super(CoffeeShop, self).__init__(**kwargs)
         with self.canvas.before:
-            Color(0.55, 0.27, 0.07, 1.0) 
+            Color(0.55, 0.27, 0.07, 1.0)
             self.rect = Rectangle(size=self.size, pos=self.pos)
         self.bind(size=self._update_rect, pos=self._update_rect)
 
@@ -140,9 +152,11 @@ class CoffeeShop(BoxLayout):
         self.rect.pos = instance.pos
         self.rect.size = instance.size
 
+
 class CoffeeShopApp(App):
     def build(self):
         return CoffeeShop()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     CoffeeShopApp().run()
