@@ -1,5 +1,6 @@
 from flask import Flask, make_response, jsonify, request
 from flask_mysqldb import MySQL
+from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
 app.config["MYSQL_HOST"] = "localhost"
@@ -10,6 +11,20 @@ app.config["MYSQL_DB"] = "sakila"
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
 mysql = MySQL(app)
+auth = HTTPBasicAuth()
+
+users = {"admin": "password"}
+
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and password == users[username]:
+        return username
+
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify({"error": "Unauthorized access"}), 401)
 
 
 @app.route("/")
@@ -26,6 +41,7 @@ def data_fetch(query):
 
 
 @app.route("/actors", methods=["GET"])
+@auth.login_required
 def get_actors():
     data = data_fetch("""select * from actor""")
     return make_response(jsonify(data), 200)
@@ -113,6 +129,21 @@ def delete_actor(id):
         ),
         200,
     )
+
+
+@app.route("/actors/search", methods=["POST"])
+def search_actors():
+    search_criteria = request.get_json()
+    first_name = search_criteria.get("first_name")
+    last_name = search_criteria.get("last_name")
+    # Modify the query to include the search criteria
+    query = f"""
+        SELECT * 
+        FROM actor 
+        WHERE first_name LIKE '{first_name}%' AND last_name LIKE '{last_name}%'
+    """
+    data = data_fetch(query)
+    return make_response(jsonify(data), 200)
 
 
 @app.route("/actors/format", methods=["GET"])
